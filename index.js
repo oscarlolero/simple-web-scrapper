@@ -10,7 +10,9 @@ app.get('/scrape', async (req, res) => {
   }
 
   try {
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath();
     const browser = await puppeteer.launch({
+      executablePath: executablePath,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();

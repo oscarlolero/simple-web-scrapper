@@ -2,6 +2,8 @@ FROM node:20
 
 # Install necessary dependencies for puppeteer
 RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
     libnss3 \
     libatk1.0-0 \
     libatk-bridge2.0-0 \
@@ -23,7 +25,14 @@ RUN apt-get update && apt-get install -y \
     libxfixes3 \
     libxcb1 \
     libxshmfence1 \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install chrome
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
+  && apt-get update \
+  && apt-get install -y google-chrome-stable
+
 
 WORKDIR /app
 
@@ -32,6 +41,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 
 EXPOSE 8080
 
